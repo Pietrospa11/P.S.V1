@@ -2,7 +2,7 @@
   "name": "Schede per Greta",
   "short_name": "Schede",
   "description": "Il tuo personal trainer AI, sempre con te",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0a1f1a",
   "theme_color": "#0a1f1a",
