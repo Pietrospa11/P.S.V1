@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a1f1a">
+    <meta name="color-scheme" content="dark">
+    <title>Schede per Greta</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            color-scheme: dark;
+            --green-deep: #0a1f1a;
+            --green-dark: #1b4332;
+            --green-mid: #2d6a4f;
+            --green-light: #40916c;
+            --blue-deep: #001d3d;
+            --blue-dark: #023047;
+            --blue-accent: #0a2540;
+            --red-accent: #9d0208;
+            --red-soft: #c1121f;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-tertiary: rgba(255, 255, 255, 0.5);
+            --glass-bg: rgba(27, 67, 50, 0.25);
+            --glass-bg-hover: rgba(27, 67, 50, 0.35);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-highlight: rgba(255, 255, 255, 0.08);
+        }
+        
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            background: var(--green-deep);
+            min-height: 100vh;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+            color-scheme: dark;
+        }
+        
+        body {
+            background: 
+                radial-gradient(ellipse at top, rgba(2, 48, 71, 0.35) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(10, 37, 64, 0.2) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom, rgba(27, 67, 50, 0.4) 0%, transparent 50%),
+                var(--green-deep);
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 20%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(45, 106, 79, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            animation: float 20s ease-in-out infinite;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 10%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(10, 37, 64, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 25s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 30px) scale(0.95); }
+        }
+        
+        .app {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .header {
+            padding: 60px 24px 20px;
+            padding-top: calc(env(safe-area-inset-top) + 30px);
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            background: rgba(10, 31, 26, 0.5);
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .header-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--green-light);
+            margin-bottom: 8px;
+        }
+        
+        .header h1 {
+            font-size: 34px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        
+        .header-accent {
+            width: 48px;
+            height: 6px;
+            background: linear-gradient(90deg, var(--green-mid) 0%, var(--blue-accent) 100%);
+            margin-top: 16px;
+            border-radius: 100px;
+            box-shadow: 
+                0 2px 8px rgba(45, 106, 79, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-accent::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .content {
+            padding: 24px;
+        }
+        
+        /* Page transitions */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 var(--glass-highlight);
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+        
+        .section-header {
+            padding: 16px 20px 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+        }
+        
+        .form-group {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            transition: background 0.2s;
+        }
+        
+        .form-group:last-child {
+            border-bottom: none;
+        }
+        
+        .form-group:focus-within {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: 0.2px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 0;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 17px;
+            font-weight: 400;
+            font-family: inherit;
+            transition: all 0.2s;
+            color-scheme: dark;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: var(--text-tertiary);
+        }
+        
+        textarea {
+            resize: none;
+            min-height: 60px;
+            line-height: 1.5;
+        }
+        
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 4px center;
+            padding-right: 32px;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            padding-left: 8px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        select:hover { background-color: rgba(255, 255, 255, 0.05); }
+        select:focus { background-color: rgba(255, 255, 255, 0.08); }
+        
+        select option {
+            background: linear-gradient(135deg, #0a1f1a 0%, #1b4332 100%);
+            color: var(--text-primary);
+            padding: 14px 16px;
+        }
+        
+        select option:checked {
+            background: linear-gradient(135deg, var(--green-mid) 0%, var(--blue-accent) 100%);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 50%, var(--blue-accent) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 8px 24px rgba(27, 67, 50, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 32px rgba(27, 67, 50, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 12px;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--glass-bg-hover);
+            transform: translateY(-1px);
+        }
+        .btn-secondary:active { transform: scale(0.98); }
+        
+        /* Result section */
+        .result-section {
+            display: none;
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .result-section.active { display: block; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .scheda-content {
+            padding: 24px;
+            line-height: 1.6;
+        }
+        
+        .scheda-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        
+        .scheda-content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 28px;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            border-left: 3px solid var(--red-accent);
+        }
+        
+        .scheda-content p {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        .scheda-content strong { font-weight: 600; }
+        
+        .scheda-content em {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 14px;
+            display: block;
+            margin-top: 4px;
+            padding-left: 12px;
+            border-left: 2px solid var(--green-mid);
+        }
+        
+        .scheda-content ul, .scheda-content ol {
+            margin: 12px 0 16px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .scheda-content li {
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            border-left: 3px solid var(--green-mid);
+            font-size: 15px;
+        }
+        
+        .scheda-content li strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+        
+        .scheda-content hr {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+            margin: 24px 0;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .loading.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--green-light);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .loading p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .error {
+            background: rgba(157, 2, 8, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(157, 2, 8, 0.3);
+            color: var(--red-soft);
+            padding: 14px 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            display: none;
+            font-size: 15px;
+        }
+        
+        .error.active {
+            display: block;
+            animation: shake 0.4s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .success-toast {
+            position: fixed;
+            top: calc(env(safe-area-inset-top) + 20px);
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--glass-bg-hover);
+            backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid var(--green-mid);
+            color: var(--text-primary);
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .success-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* History cards */
+        .history-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .history-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        }
+        
+        .history-card:hover {
+            background: var(--glass-bg-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        .history-card.completata {
+            border-color: var(--green-mid);
+            opacity: 0.7;
+        }
+        
+        .history-card.completata::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 22px;
+            height: 22px;
+            background: var(--green-mid);
+            border-radius: 50%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .history-card-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            padding-right: 32px;
+        }
+        
+        .history-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .history-card-tag {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .history-card-date {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-tertiary);
+        }
+        
+        .empty-state-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            opacity: 0.3;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        /* Modal per dettaglio scheda */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--green-deep);
+            z-index: 200;
+            display: none;
+            overflow-y: auto;
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modal.active { display: block; }
+        
+        @keyframes slideIn {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .modal-header {
+            position: sticky;
+            top: 0;
+            padding: calc(env(safe-area-inset-top) + 20px) 20px 16px;
+            backdrop-filter: blur(30px) saturate(180%);
+            background: rgba(10, 31, 26, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .modal-close {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: var(--glass-bg-hover);
+            transform: scale(1.05);
+        }
+        
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+        
+        .modal-actions {
+            padding: 16px 24px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+        }
+        
+        .btn-danger {
+            background: rgba(157, 2, 8, 0.2);
+            color: var(--red-soft);
+            border: 1px solid rgba(157, 2, 8, 0.3);
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-danger:hover {
+            background: rgba(157, 2, 8, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(45, 106, 79, 0.4);
+        }
+        
+        .btn-success:hover { transform: translateY(-1px); }
+        
+        /* Bottom Tab Bar - iOS Style */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: calc(70px + env(safe-area-inset-bottom));
+            padding-bottom: env(safe-area-inset-bottom);
+            background: rgba(10, 31, 26, 0.7);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            z-index: 150;
+        }
+        
+        .tab-bar-inner {
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 10px;
+        }
+        
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        
+        .tab-item svg {
+            width: 26px;
+            height: 26px;
+            stroke-width: 1.8;
+            transition: all 0.2s;
+        }
+        
+        .tab-item span {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        
+        .tab-item.active {
+            color: var(--green-light);
+        }
+        
+        .tab-item.active svg {
+            stroke-width: 2.2;
+        }
+        
+        .tab-item:active {
+            transform: scale(0.92);
+        }
+        
+        @media (max-width: 380px) {
+            .header h1 { font-size: 28px; }
+            .content { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header dinamico -->
+        <header class="header">
+            <div class="header-label" id="header-label">Personal Training</div>
+            <h1 id="header-title">Schede per Greta</h1>
+            <div class="header-accent"></div>
+        </header>
+        
+        <main class="content">
+            <!-- PAGE 1: Genera -->
+            <div class="page active" id="page-genera">
+                <div class="error" id="error-message"></div>
+                
+                <form id="scheda-form">
+                    <div class="section">
+                        <div class="section-header">Allenamento</div>
+                        
+                        <div class="form-group">
+                            <label for="obiettivo">Obiettivo</label>
+                            <textarea id="obiettivo" placeholder="Tonificare braccia e spalle, migliorare resistenza..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tempo">Tempo disponibile</label>
+                            <select id="tempo" required>
+                                <option value="">Seleziona durata</option>
+                                <option value="15 minuti">15 minuti</option>
+                                <option value="20 minuti">20 minuti</option>
+                                <option value="25 minuti">25 minuti</option>
+                                <option value="30 minuti">30 minuti</option>
+                                <option value="45 minuti">45 minuti</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="livello">Livello</label>
+                            <select id="livello" required>
+                                <option value="">Seleziona livello</option>
+                                <option value="Principiante">Principiante</option>
+                                <option value="Intermedio">Intermedio</option>
+                                <option value="Avanzato">Avanzato</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-header">Contesto</div>
+                        
+                        <div class="form-group">
+                            <label for="attrezzatura">Attrezzatura disponibile</label>
+                            <textarea id="attrezzatura" placeholder="Bottiglie d'acqua, sedia, tappetino..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="limitazioni">Limitazioni fisiche (opzionale)</label>
+                            <textarea id="limitazioni" placeholder="Mal di schiena, problemi alle ginocchia..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary" id="submit-btn">
+                        Genera Scheda
+                    </button>
+                </form>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Creazione scheda in corso...</p>
+                </div>
+                
+                <div class="result-section" id="result-section">
+                    <div class="section">
+                        <div class="scheda-content" id="scheda-content"></div>
+                    </div>
+                    <button class="btn-secondary" onclick="nuovaScheda()">
+                        Nuova Scheda
+                    </button>
+                </div>
+            </div>
+            
+            <!-- PAGE 2: Storico -->
+            <div class="page" id="page-storico">
+                <div id="history-container">
+                    <!-- Caricato dinamicamente -->
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Modal per dettaglio scheda -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-header">
+            <div class="modal-title">Dettaglio Scheda</div>
+            <button class="modal-close" onclick="closeModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-actions" id="modal-actions">
+            <button class="btn-success" id="btn-completa" onclick="completaScheda()">
+                Segna come completata
+            </button>
+            <button class="btn-danger" onclick="eliminaScheda()">
+                Elimina
+            </button>
+        </div>
+        <div class="scheda-content" id="modal-content" style="padding: 24px;"></div>
+    </div>
+    
+    <!-- Toast di successo -->
+    <div class="success-toast" id="success-toast">Scheda salvata</div>
+    
+    <!-- Bottom Tab Bar -->
+    <nav class="tab-bar">
+        <div class="tab-bar-inner">
+            <button class="tab-item active" data-tab="genera" onclick="switchTab('genera')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                <span>Genera</span>
+            </button>
+            <button class="tab-item" data-tab="storico" onclick="switchTab('storico')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 8v4l3 3"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                <span>Storico</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        const API_URL = 'https://p-s-ljeg.onrender.com';
+        let currentSchedaId = null;
+        
+        // === TAB NAVIGATION ===
+        function switchTab(tabName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(`page-${tabName}`).classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update header
+            const label = document.getElementById('header-label');
+            const title = document.getElementById('header-title');
+            
+            if (tabName === 'genera') {
+                label.textContent = 'Personal Training';
+                title.textContent = 'Schede per Greta';
+            } else if (tabName === 'storico') {
+                label.textContent = 'Le tue schede';
+                title.textContent = 'Storico';
+                loadStorico();
+            }
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // === GENERA SCHEDA ===
+        const form = document.getElementById('scheda-form');
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('result-section');
+        const schedaContent = document.getElementById('scheda-content');
+        const errorMessage = document.getElementById('error-message');
+        const submitBtn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            errorMessage.classList.remove('active');
+            loading.classList.add('active');
+            resultSection.classList.remove('active');
+            form.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            const dati = {
+                obiettivo: document.getElementById('obiettivo').value,
+                tempo: document.getElementById('tempo').value,
+                livello: document.getElementById('livello').value,
+                attrezzatura: document.getElementById('attrezzatura').value,
+                limitazioni: document.getElementById('limitazioni').value || 'Nessuna'
+            };
+            
+            try {
+                // Step 1: Genera scheda con AI
+                const response = await fetch(`${API_URL}/genera-scheda`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dati)
+                });
+                
+                const result = await response.json();
+                
+                if (!result.successo) throw new Error('Errore nella generazione');
+                
+                const contenutoScheda = result.scheda;
+                
+                // Mostra la scheda
+                schedaContent.innerHTML = marked.parse(contenutoScheda);
+                loading.classList.remove('active');
+                resultSection.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Step 2: Salva automaticamente nel database
+                const saveResponse = await fetch(
+                    `${API_URL}/salva-scheda?contenuto=${encodeURIComponent(contenutoScheda)}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(dati)
+                    }
+                );
+                
+                const saveResult = await saveResponse.json();
+                
+                if (saveResult.successo) {
+                    showToast('Scheda salvata');
+                }
+                
+            } catch (error) {
+                loading.classList.remove('active');
+                form.style.display = 'block';
+                errorMessage.textContent = error.message;
+                errorMessage.classList.add('active');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+        
+        function nuovaScheda() {
+            resultSection.classList.remove('active');
+            form.style.display = 'block';
+            form.reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('success-toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+        
+        // === STORICO ===
+        async function loadStorico() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '<div class="loading active"><div class="spinner"></div><p>Caricamento...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_URL}/schede`);
+                const schede = await response.json();
+                
+                if (schede.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="12" x2="12" y2="18"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                            <h3>Nessuna scheda</h3>
+                            <p>Genera la tua prima scheda per vederla qui</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = schede.map(s => {
+                    const date = new Date(s.created_at).toLocaleDateString('it-IT', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Estrai titolo dal contenuto markdown (prima riga con #)
+                    const titleMatch = s.contenuto.match(/^#\s*(.+)$/m);
+                    const title = titleMatch ? titleMatch[1].replace(/\*\*/g, '') : s.obiettivo;
+                    
+                    return `
+                        <div class="history-card ${s.completata ? 'completata' : ''}" onclick="openDetail('${s.id}')">
+                            <div class="history-card-title">${escapeHtml(title)}</div>
+                            <div class="history-card-meta">
+                                <span class="history-card-tag">${escapeHtml(s.tempo)}</span>
+                                <span class="history-card-tag">${escapeHtml(s.livello)}</span>
+                            </div>
+                            <div class="history-card-date">${date}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error active">Errore nel caricamento: ${error.message}</div>
+                `;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // === MODAL DETTAGLIO ===
+        async function openDetail(id) {
+            currentSchedaId = id;
+            
+            try {
+                const response = await fetch(`${API_URL}/schede`);
+                const schede = await response.json();
+                const scheda = schede.find(s => s.id === id);
+                
+                if (!scheda) return;
+                
+                document.getElementById('modal-content').innerHTML = marked.parse(scheda.contenuto);
+                
+                const btnCompleta = document.getElementById('btn-completa');
+                if (scheda.completata) {
+                    btnCompleta.textContent = 'Scheda completata';
+                    btnCompleta.disabled = true;
+                    btnCompleta.style.opacity = '0.6';
+                } else {
+                    btnCompleta.textContent = 'Segna come completata';
+                    btnCompleta.disabled = false;
+                    btnCompleta.style.opacity = '1';
+                }
+                
+                document.getElementById('detail-modal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('detail-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentSchedaId = null;
+        }
+        
+        async function completaScheda() {
+            if (!currentSchedaId) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/schede/${currentSchedaId}/completa`, {
+                    method: 'PATCH'
+                });
+                
+                if (response.ok) {
+                    showToast('Scheda completata!');
+                    closeModal();
+                    loadStorico();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        async function eliminaScheda() {
+            if (!currentSchedaId) return;
+            
+            if (!confirm('Sei sicuro di voler eliminare questa scheda?')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/schede/${currentSchedaId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    showToast('Scheda eliminata');
+                    closeModal();
+                    loadStorico();
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
